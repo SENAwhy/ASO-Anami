@@ -68,6 +68,7 @@ class RuleEngineNotifier extends StateNotifier<RuleEngineState> {
           (index['files'] as List<dynamic>).map((e) => e as String).toList();
 
       final List<RuleSource> sources = [];
+      final List<String> errors = [];
       for (final fileName in fileNames) {
         try {
           final content =
@@ -75,15 +76,23 @@ class RuleEngineNotifier extends StateNotifier<RuleEngineState> {
           final jsonMap = json.decode(content) as Map<String, dynamic>;
           sources.add(RuleSource.fromJson(jsonMap));
         } catch (e) {
-          // 跳过解析失败的规则文件
+          errors.add('$fileName: $e');
           continue;
         }
       }
 
-      state = RuleEngineState(
-        sources: sources,
-        activeSourceId: sources.isNotEmpty ? sources.first.id : null,
-      );
+      if (sources.isEmpty && errors.isNotEmpty) {
+        state = RuleEngineState(
+          isLoading: false,
+          error: '所有规则文件解析失败:\n${errors.join('\n')}',
+        );
+      } else {
+        state = RuleEngineState(
+          sources: sources,
+          activeSourceId: sources.isNotEmpty ? sources.first.id : null,
+          error: errors.isNotEmpty ? '部分规则加载失败: ${errors.join('; ')}' : null,
+        );
+      }
     } catch (e) {
       state = state.copyWith(
         isLoading: false,

@@ -20,12 +20,21 @@ final ruleExecutorProvider = Provider<RuleExecutor?>((ref) {
 });
 
 /// 首页分类/列表数据 Provider
+/// watch ruleExecutorProvider 确保规则源加载后自动刷新
 final browseListProvider =
     FutureProvider.family<List<AnimeItem>, String>((ref, categoryPath) async {
   final executor = ref.watch(ruleExecutorProvider);
-  if (executor == null) throw Exception('规则源未加载');
+  if (executor == null) throw Exception('规则源未加载，请稍候...');
 
-  return executor.fetchCategoryList(categoryPath, 1);
+  try {
+    final result = await executor.fetchCategoryList(categoryPath, 1);
+    if (result.isEmpty) {
+      throw Exception('未获取到数据，可能是网页结构变化或网络问题');
+    }
+    return result;
+  } catch (e) {
+    rethrow;
+  }
 });
 
 /// 搜索 Provider

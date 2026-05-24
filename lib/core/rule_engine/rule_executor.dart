@@ -75,6 +75,7 @@ class RuleExecutor {
     }
 
     final config = _source.search!;
+    final fields = config.fields;
     final url = _resolveUrl(
       config.path.replaceAll('{keyword}', Uri.encodeComponent(keyword)),
     );
@@ -87,13 +88,19 @@ class RuleExecutor {
 
     for (final element in items) {
       final id = DataExtractor.extractFromElement(
-              element, fields['id'] ?? fields['detailUrl']!) ??
+              element,
+              fields['id'] ??
+                  fields['detailUrl'] ??
+                  const ExtractRule()) ??
           '';
       final title = DataExtractor.extractFromElement(
-              element, fields['title'] ?? fields['title']!) ??
+              element, fields['title'] ?? const ExtractRule()) ??
           '';
       final coverUrl = DataExtractor.extractFromElement(
-              element, fields['cover'] ?? fields['coverUrl']!) ??
+              element,
+              fields['cover'] ??
+                  fields['coverUrl'] ??
+                  const ExtractRule()) ??
           '';
 
       if (title.isNotEmpty && id.isNotEmpty) {
@@ -127,9 +134,51 @@ class RuleExecutor {
     final path = categoryPath.replaceAll('{page}', page.toString());
     final url = _resolveUrl(path);
 
+    // ignore: avoid_print
+    print('[RuleExecutor] 请求分类列表: $url');
+
     final html = await _http.getString(url, headers: _source.headers);
+
+    // ignore: avoid_print
+    print('[RuleExecutor] 响应长度: ${html.length}, 前200字: ${html.substring(0, html.length > 200 ? 200 : html.length)}');
+
     final document = parse(html);
     final items = document.querySelectorAll(listItemSelector);
+
+    // ignore: avoid_print
+    print('[RuleExecutor] 选择器 "$listItemSelector" 匹配到 ${items.length} 个元素');
+
+    if (items.isEmpty) {
+      // 选择器未匹配到任何元素，抛出包含HTML片段的详细错误
+      // 尝试显示 body 中的 class 列表，帮助定位正确选择器
+      final body = document.body;
+      final bodyClasses = body?.classes.toList() ?? [];
+      final bodyHtml = body?.innerHtml ?? '';
+      final bodySnippet = bodyHtml.length > 500 ? bodyHtml.substring(0, 500) : bodyHtml;
+      // 收集页面中所有 class 名
+      final allElements = body?.querySelectorAll('[class]') ?? [];
+      final classSet = <String>{};
+      for (final el in allElements.take(200)) {
+        classSet.addAll(el.classes);
+      }
+      // 找出包含图片的元素（通常是动漫卡片）
+      final imgElements = body?.querySelectorAll('img') ?? [];
+      final imgParents = <String>[];
+      for (final img in imgElements.take(20)) {
+        final parent = img.parent;
+        final parentClass = parent?.classes.join('.') ?? '';
+        final parentId = parent?.id ?? '';
+        imgParents.add('${parent?.localName}.${parentClass}#${parentId} > img[src*="upload"]');
+      }
+      final longerBodySnippet = bodyHtml.length > 2000 ? bodyHtml.substring(0, 2000) : bodyHtml;
+      throw Exception(
+        '选择器 "$listItemSelector" 未匹配到任何元素。\n'
+        '页面标题: ${document.querySelector("title")?.text ?? "无"}\n'
+        '所有class: ${classSet.take(60).join(", ")}\n'
+        '图片父元素: ${imgParents.take(10).join(" | ")}\n'
+        'Body前2000字: $longerBodySnippet'
+      );
+    }
 
     final results = <AnimeItem>[];
 
@@ -178,8 +227,23 @@ class RuleExecutor {
 
     // 提取标题 (从页面标题)
     String title = document.querySelector('title')?.text.trim() ?? '';
-    // 尝试从规则字段中获取封面
+    // 尝试从 og:image 或规则字段提取封面
     String coverUrl = '';
+    final ogImageEl = document.querySelector('meta[property="og:image"]');
+    if (ogImageEl != null) {
+      coverUrl = DataExtractor.extractFromElement(
+              ogImageEl, const ExtractRule(postProcess: 'attr:content')) ??
+          '';
+    }
+    // 回退：规则字段封面选择器
+    if (coverUrl.isEmpty && config.fields['cover'] != null) {
+      final body = document.body;
+      if (body != null) {
+        coverUrl =
+            DataExtractor.extractFromElement(body, config.fields['cover']!) ??
+                '';
+      }
+    }
 
     // 提取剧集列表
     final episodeElements =
@@ -187,13 +251,16 @@ class RuleExecutor {
     final episodes = <EpisodeItem>[];
 
     for (final element in episodeElements) {
+      final idRule = config.fields['id'] ?? config.fields['playId'];
+      if (idRule == null) continue;
       final episodeId = DataExtractor.extractFromElement(
-              element, config.fields['id'] ?? config.fields['playId']!) ??
+              element, idRule) ??
           '';
+      if (episodeId.isEmpty) continue;
+
+      final titleRule = config.fields['title'] ?? config.fields['episodeTitle'];
       final episodeTitle = DataExtractor.extractFromElement(
-              element,
-              config.fields['title'] ??
-                  config.fields['episodeTitle']!) ??
+              element, titleRule ?? const ExtractRule()) ??
           '';
 
       if (episodeId.isNotEmpty) {

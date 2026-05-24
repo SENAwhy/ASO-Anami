@@ -30,19 +30,58 @@ class BrowsePage extends ConsumerWidget {
           ? const Center(child: CircularProgressIndicator())
           : ruleState.error != null
               ? Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.error_outline, size: 48, color: Colors.red),
-                      const SizedBox(height: 12),
-                      Text(ruleState.error!),
-                    ],
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                        const SizedBox(height: 12),
+                        Text(ruleState.error!,
+                          style: const TextStyle(color: Colors.red),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        FilledButton(
+                          onPressed: () => ref.read(ruleEngineProvider.notifier).loadRules(),
+                          child: const Text('重新加载'),
+                        ),
+                      ],
+                    ),
                   ),
                 )
               : categories.isEmpty
-                  ? const Center(child: Text('暂无规则源，请在 assets/rules/ 中添加规则文件'))
+                  ? Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.inbox, size: 48, color: Colors.grey),
+                          const SizedBox(height: 12),
+                          const Text('暂无规则源'),
+                          const SizedBox(height: 8),
+                          Text('已加载 ${ruleState.sources.length} 个源',
+                            style: const TextStyle(color: Colors.grey),
+                          ),
+                          const SizedBox(height: 16),
+                          FilledButton(
+                            onPressed: () => ref.read(ruleEngineProvider.notifier).loadRules(),
+                            child: const Text('重新加载规则'),
+                          ),
+                        ],
+                      ),
+                    )
                   : ListView(
                       children: [
+                        // 部分加载失败警告
+                        if (ruleState.error != null)
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(8),
+                            color: Colors.orange.shade100,
+                            child: Text(ruleState.error!,
+                              style: TextStyle(color: Colors.orange.shade900, fontSize: 12),
+                            ),
+                          ),
                         // 源切换区域
                         if (ruleState.sources.length > 1)
                           Padding(
@@ -99,7 +138,12 @@ class _CategorySection extends ConsumerWidget {
           child: animeList.when(
             loading: () =>
                 const Center(child: CircularProgressIndicator()),
-            error: (e, _) => Center(child: Text('加载失败: $e')),
+            error: (e, _) => SingleChildScrollView(
+              padding: const EdgeInsets.all(8.0),
+              child: Text('加载失败: $e',
+                style: const TextStyle(color: Colors.red, fontSize: 11),
+              ),
+            ),
             data: (items) => ListView.builder(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 12),

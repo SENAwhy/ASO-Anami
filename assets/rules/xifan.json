@@ -1,0 +1,81 @@
+{
+  "id": "xifan",
+  "name": "稀饭动漫",
+  "baseUrl": "https://dm.xifanacg.com",
+  "headers": {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+    "Referer": "https://dm.xifanacg.com/"
+  },
+  "search": {
+    "path": "/search?wd={keyword}",
+    "method": "GET",
+    "listItemSelector": ".stui-vodlist__box",
+    "fields": {
+      "id": {
+        "selector": "a",
+        "postProcess": "attr:href"
+      },
+      "title": {
+        "selector": "a",
+        "postProcess": "attr:title"
+      },
+      "cover": {
+        "selector": "img",
+        "postProcess": "attr:data-src"
+      }
+    }
+  },
+  "categories": [
+    {
+      "id": "recent",
+      "name": "最近更新",
+      "path": "/show/1--hits--------f---{page}.html"
+    },
+    {
+      "id": "japanese",
+      "name": "日本动漫",
+      "path": "/show/1-日本-------hits---f---{page}.html"
+    }
+  ],
+  "categoryConfig": {
+    "path": "",
+    "method": "GET",
+    "listItemSelector": ".stui-vodlist__box",
+    "fields": {
+      "id": {
+        "selector": "a",
+        "postProcess": "attr:href"
+      },
+      "title": {
+        "selector": "a",
+        "postProcess": "attr:title"
+      },
+      "cover": {
+        "selector": "img",
+        "postProcess": "attr:data-src"
+      }
+    }
+  },
+  "detail": {
+    "path": "{id}",
+    "method": "GET",
+    "episodeListSelector": ".stui-content__playlist a",
+    "summarySelector": ".detail",
+    "fields": {
+      "id": {
+        "postProcess": "attr:href"
+      },
+      "title": {
+        "postProcess": "text"
+      }
+    }
+  },
+  "play": {
+    "path": "{id}",
+    "method": "GET",
+    "videoUrl": {
+      "selector": "iframe",
+      "postProcess": "attr:src"
+    }
+  }
+}
