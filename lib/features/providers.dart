@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/network/http_client_service.dart';
-import '../../core/rule_engine/rule_executor.dart';
-import '../../core/rule_engine/anime_models.dart';
-import '../../core/rule_engine/rule_loader.dart';
+import '../core/network/http_client_service.dart';
+import '../core/rule_engine/rule_executor.dart';
+import '../core/rule_engine/anime_models.dart';
+import '../core/rule_engine/rule_loader.dart';
 
 /// HTTP 客户端 Provider (单例)
 final httpClientProvider = Provider<HttpClientService>((ref) {

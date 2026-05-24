@@ -48,7 +48,8 @@ class AnamiApp extends StatelessWidget {
         final args = settings.arguments as Map<String, dynamic>;
         return MaterialPageRoute(
           builder: (_) => PlayerPage(
-            videoUrl: args['videoUrl'] as String,
+            videoUrl: (args['videoUrl'] as String?) ?? '',
+            episodeId: args['episodeId'] as String?,
             title: args['title'] as String,
           ),
         );

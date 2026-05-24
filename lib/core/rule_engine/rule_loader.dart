@@ -60,20 +60,18 @@ class RuleEngineNotifier extends StateNotifier<RuleEngineState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      // 读取 assets/rules/ 下的清单文件
-      final manifestContent =
-          await rootBundle.loadString('AssetManifest.json');
-      final manifest = json.decode(manifestContent) as Map<String, dynamic>;
-
-      final ruleFiles = manifest.keys
-          .where((key) =>
-              key.startsWith('assets/rules/') && key.endsWith('.json'))
-          .toList();
+      // 读取规则索引文件，获取所有规则文件列表
+      final indexContent =
+          await rootBundle.loadString('assets/rules/index.json');
+      final index = json.decode(indexContent) as Map<String, dynamic>;
+      final fileNames =
+          (index['files'] as List<dynamic>).map((e) => e as String).toList();
 
       final List<RuleSource> sources = [];
-      for (final filePath in ruleFiles) {
+      for (final fileName in fileNames) {
         try {
-          final content = await rootBundle.loadString(filePath);
+          final content =
+              await rootBundle.loadString('assets/rules/$fileName');
           final jsonMap = json.decode(content) as Map<String, dynamic>;
           sources.add(RuleSource.fromJson(jsonMap));
         } catch (e) {
