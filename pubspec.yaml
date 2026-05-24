@@ -1,0 +1,59 @@
+name: anami
+description: 基于自定义规则的番剧采集APP，支持流媒体在线观看、弹幕。
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: '>=3.2.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # 状态管理
+  flutter_riverpod: ^2.5.1
+  riverpod_annotation: ^2.3.5
+
+  # 网络请求
+  dio: ^5.4.3+1
+  dio_cache_interceptor: ^3.5.1
+
+  # HTML 解析 (CSS选择器提取数据)
+  html: ^0.15.4
+
+  # 视频播放 (libmpv 封装)
+  media_kit: ^1.1.11
+  media_kit_video: ^1.2.5
+  media_kit_libs_video: ^1.0.5
+
+  # 弹幕 (待后续集成)
+  # flutter_danmaku: ^0.2.0
+
+  # 本地存储
+  shared_preferences: ^2.2.3
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+
+  # JSON 序列化
+  json_annotation: ^4.9.0
+
+  # 图片缓存
+  cached_network_image: ^3.3.1
+
+  # 工具
+  path_provider: ^2.1.3
+  url_launcher: ^6.2.6
+  intl: ^0.19.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  build_runner: ^2.4.9
+  json_serializable: ^6.8.0
+  riverpod_generator: ^2.4.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/rules/

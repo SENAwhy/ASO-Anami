@@ -1,0 +1,68 @@
+{
+  "id": "ntdm9",
+  "name": "NT动漫",
+  "baseUrl": "https://www.ntdm9.com",
+  "headers": {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+    "Referer": "https://www.ntdm9.com/"
+  },
+  "search": {
+    "path": "/search.html?wd={keyword}",
+    "method": "GET",
+    "listItemSelector": ".lpic > ul > li",
+    "fields": {
+      "id": {
+        "selector": "a",
+        "postProcess": "attr:href"
+      },
+      "title": {
+        "selector": "h2 a",
+        "postProcess": "text"
+      },
+      "cover": {
+        "selector": "img",
+        "postProcess": "attr:src"
+      }
+    }
+  },
+  "categories": [
+    {
+      "id": "dongman",
+      "name": "最新更新",
+      "path": "/acg/{page}.html"
+    },
+    {
+      "id": "ribendongman",
+      "name": "日本动漫",
+      "path": "/acg/1/{page}.html"
+    },
+    {
+      "id": "guochandongman",
+      "name": "国产动漫",
+      "path": "/acg/2/{page}.html"
+    }
+  ],
+  "detail": {
+    "path": "{id}",
+    "method": "GET",
+    "episodeListSelector": ".movurl > ul > li > a",
+    "summarySelector": ".info > .txt",
+    "fields": {
+      "id": {
+        "selector": "a",
+        "postProcess": "attr:href"
+      },
+      "title": {
+        "postProcess": "text"
+      }
+    }
+  },
+  "play": {
+    "path": "{id}",
+    "method": "GET",
+    "videoUrl": {
+      "selector": "video source",
+      "postProcess": "attr:src"
+    }
+  }
+}
