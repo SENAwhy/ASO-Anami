@@ -163,8 +163,11 @@ class RuleSource {
   /// 搜索配置
   final SearchConfig? search;
 
-  /// 分类配置
+  /// 分类元数据
   final List<RuleCategory>? categories;
+
+  /// 分类列表提取配置 (列表项选择器 + 字段映射)
+  final CategoryConfig? categoryConfig;
 
   /// 详情配置
   final DetailConfig? detail;
@@ -181,6 +184,7 @@ class RuleSource {
     required this.baseUrl,
     this.search,
     this.categories,
+    this.categoryConfig,
     this.detail,
     this.play,
     this.headers,

@@ -25,6 +25,25 @@
       }
     }
   },
+  "categoryConfig": {
+    "path": "",
+    "method": "GET",
+    "listItemSelector": ".lpic > ul > li",
+    "fields": {
+      "id": {
+        "selector": "a",
+        "postProcess": "attr:href"
+      },
+      "title": {
+        "selector": "h2 a",
+        "postProcess": "text"
+      },
+      "cover": {
+        "selector": "img",
+        "postProcess": "attr:src"
+      }
+    }
+  },
   "categories": [
     {
       "id": "dongman",
@@ -49,7 +68,6 @@
     "summarySelector": ".info > .txt",
     "fields": {
       "id": {
-        "selector": "a",
         "postProcess": "attr:href"
       },
       "title": {

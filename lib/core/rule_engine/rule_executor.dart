@@ -87,13 +87,13 @@ class RuleExecutor {
 
     for (final element in items) {
       final id = DataExtractor.extractFromElement(
-              element, config.fields['id'] ?? config.fields['detailUrl']!) ??
+              element, fields['id'] ?? fields['detailUrl']!) ??
           '';
       final title = DataExtractor.extractFromElement(
-              element, config.fields['title'] ?? config.fields['title']!) ??
+              element, fields['title'] ?? fields['title']!) ??
           '';
       final coverUrl = DataExtractor.extractFromElement(
-              element, config.fields['cover'] ?? config.fields['coverUrl']!) ??
+              element, fields['cover'] ?? fields['coverUrl']!) ??
           '';
 
       if (title.isNotEmpty && id.isNotEmpty) {
@@ -114,8 +114,13 @@ class RuleExecutor {
   /// 传入分类名和页码，返回 AnimeItem 列表。
   Future<List<AnimeItem>> fetchCategoryList(
       String categoryPath, int page) async {
-    final config = _source.search; // 复用搜索配置
-    if (config == null) {
+    // 优先使用 categoryConfig，回退到 search 配置
+    final categoryCfg = _source.categoryConfig;
+    final searchCfg = _source.search;
+    final listItemSelector =
+        categoryCfg?.listItemSelector ?? searchCfg?.listItemSelector;
+    final fields = categoryCfg?.fields ?? searchCfg?.fields;
+    if (listItemSelector == null || fields == null) {
       throw Exception('${_source.name}: 未配置列表接口');
     }
 
@@ -124,19 +129,19 @@ class RuleExecutor {
 
     final html = await _http.getString(url, headers: _source.headers);
     final document = parse(html);
-    final items = document.querySelectorAll(config.listItemSelector);
+    final items = document.querySelectorAll(listItemSelector);
 
     final results = <AnimeItem>[];
 
     for (final element in items) {
       final id = DataExtractor.extractFromElement(
-              element, config.fields['id'] ?? config.fields['detailUrl']!) ??
+              element, fields['id'] ?? fields['detailUrl']!) ??
           '';
       final title = DataExtractor.extractFromElement(
-              element, config.fields['title'] ?? config.fields['title']!) ??
+              element, fields['title'] ?? fields['title']!) ??
           '';
       final coverUrl = DataExtractor.extractFromElement(
-              element, config.fields['cover'] ?? config.fields['coverUrl']!) ??
+              element, fields['cover'] ?? fields['coverUrl']!) ??
           '';
 
       if (title.isNotEmpty && id.isNotEmpty) {
