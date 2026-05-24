@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'features/browse/browse_page.dart';
 import 'features/search/search_page.dart';

@@ -1,12 +1,12 @@
-/// 规则源 — 完整的番剧源规则定义
-///
-/// 每个规则源描述了一个第三方番剧网站的四个接口：
-///   search   — 搜索番剧
-///   category — 分类/列表浏览
-///   detail   — 番剧详情(剧集列表)
-///   play     — 视频播放地址解析
-///
-/// 规则文件以 JSON 格式存放在 assets/rules/ 目录下。
+// 规则源 — 完整的番剧源规则定义
+//
+// 每个规则源描述了一个第三方番剧网站的四个接口：
+//   search   — 搜索番剧
+//   category — 分类/列表浏览
+//   detail   — 番剧详情(剧集列表)
+//   play     — 视频播放地址解析
+//
+// 规则文件以 JSON 格式存放在 assets/rules/ 目录下。
 import 'package:json_annotation/json_annotation.dart';
 
 part 'rule_models.g.dart';

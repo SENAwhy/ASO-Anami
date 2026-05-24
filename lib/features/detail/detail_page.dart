@@ -141,7 +141,7 @@ class _DetailContent extends StatelessWidget {
       BuildContext context, EpisodeItem episode, String animeTitle) {
     Navigator.pushNamed(context, '/player', arguments: {
       'episodeId': episode.playId,
-      'title': '${animeTitle} - ${episode.title}',
+      'title': '$animeTitle - ${episode.title}',
     });
   }
 }
